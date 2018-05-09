@@ -15,6 +15,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+# Claves
 cliente_id="364280739195-pg4r0km6r1guvuvp8d8ts7f0i2jnchoh.apps.googleusercontent.com"
 cliente_secret="lKkSc2V6pGN7E3bz2hUtAa8x"
 redirect_uri="http://sistemaswebgae.appspot.com/callback_uri"
