@@ -11,15 +11,14 @@ from webapp2_extras import sessions
 import httplib2
 
 JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'static/templates')),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
 # Claves
-cliente_id="364280739195-pg4r0km6r1guvuvp8d8ts7f0i2jnchoh.apps.googleusercontent.com"
-cliente_secret="lKkSc2V6pGN7E3bz2hUtAa8x"
-redirect_uri="http://sistemaswebgae.appspot.com/callback_uri"
-
+client_id = "364280739195-pg4r0km6r1guvuvp8d8ts7f0i2jnchoh.apps.googleusercontent.com"
+client_secret_id = "lKkSc2V6pGN7E3bz2hUtAa8x"
+redirect_uri = "http://sistemaswebgae.appspot.com/callback_uri"
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -33,13 +32,18 @@ class BaseHandler(webapp2.RequestHandler):
     @webapp2.cached_property
     def session(self):
         return self.session_store.get_session()
-config = {}
-config['webapp2_extras.sessions'] = {'secret_key': 'my-super-secret-key'}
+
+
+config = {'webapp2_extras.sessions': {'secret_key': 'my-super-secret-key'}}
 
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('<a href="/LoginAndAuthorize">Login ant Authorize with Calendar</a>')
+        # Cargar template
+        template = JINJA_ENVIRONMENT.get_template("index.php")
+
+        # Renderizar template
+        self.response.out.write(template.render())
 
 
 class LoginAndAuthorize(BaseHandler):
@@ -48,7 +52,7 @@ class LoginAndAuthorize(BaseHandler):
         conn = httplib.HTTPSConnection(servidor)
         conn.connect()
         metodo = 'GET'
-        params = {'client_id': cliente_id,
+        params = {'client_id': client_id,
                   'redirect_uri': redirect_uri,
                   'response_type': 'code',
                   'scope': 'https://www.googleapis.com/auth/calendar',
@@ -68,8 +72,8 @@ class OAuthHandler(BaseHandler):
         uri = '/o/oauth2/token'
         auth_code = self.request.get('code')
         params = {'code': auth_code,
-                  'client_id': cliente_id,
-                  'client_secret': cliente_secret,
+                  'client_id': client_id,
+                  'client_secret': client_secret_id,
                   'redirect_uri': redirect_uri,
                   'grant_type': 'authorization_code'}
         params_encoded = urllib.urlencode(params)
@@ -100,23 +104,20 @@ class CalendarLista(BaseHandler):
         uri = '/calendar/v3/users/me/calendarList'
         cabeceras = {'Host': servidor,
                      'Authorization': 'Bearer ' + access_token
-                    }
+                     }
         http = httplib2.Http()
         respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
 
         logging.debug(respuesta)
         logging.debug(cuerpo)
-        json_cuerpo=json.loads(cuerpo)
+        json_cuerpo = json.loads(cuerpo)
 
-        self.response.write('<html><head>')
-        self.response.write('<title>Calendarios</title>')
-        self.response.write('</head>')
-
-        self.response.write('<h1>Mis Calendarios de Google son</h1>')
-        for each in json_cuerpo['items']:
-            self.response.write('   '+ each['summary']+ ' su ID es:' + each ['id']+'</br>')
-            self.response.write('</body></html>')
-
+        # Cargar template
+        template = JINJA_ENVIRONMENT.get_template("calendar_list.php")
+        data = json_cuerpo
+        
+        # Renderizar template
+        self.response.out.write(template.render(data))
 
 
 app = webapp2.WSGIApplication([
