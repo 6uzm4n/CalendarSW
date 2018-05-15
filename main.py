@@ -11,7 +11,7 @@ from webapp2_extras import sessions
 import httplib2
 
 JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'static/templates')),
+    loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
@@ -91,10 +91,10 @@ class OAuthHandler(BaseHandler):
         self.session['access_token'] = access_token
         logging.debug(access_token)
 
-        self.redirect('/CalendarLista')
+        self.redirect('/CalendarList')
 
 
-class CalendarLista(BaseHandler):
+class CalendarList(BaseHandler):
     def get(self):
         access_token = self.session.get('access_token')
         logging.debug(access_token)
@@ -120,8 +120,22 @@ class CalendarLista(BaseHandler):
         self.response.out.write(template.render(data))
 
 
+class Calendar(BaseHandler):
+    def get(self):
+        id = self.request.get('id')
+        # Cargar template
+        template = JINJA_ENVIRONMENT.get_template("calendar.php")
+        data = {'id': id,
+                'id2': 2}
+
+        # Renderizar template
+        self.response.out.write(template.render(data))
+
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/LoginAndAuthorize', LoginAndAuthorize),
     ('/callback_uri', OAuthHandler),
-    ('/CalendarLista', CalendarLista)], config=config, debug=True)
+    ('/CalendarList', CalendarList),
+    ('/Calendar', Calendar)], config=config, debug=True)

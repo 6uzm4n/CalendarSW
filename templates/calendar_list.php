@@ -22,13 +22,13 @@
   <body>
     <h1>Mis calendarios de Google son:</h1>
     <table>
-        <tr>
-            <th><a href="http://google.com">Nombre</a></th>
-            <th>ID</th>
-        </tr>
+      <tr>
+        <th>Nombre</th>
+        <th>ID</th>
+      </tr>
       {% for each in items %}
       <tr>
-        <td>{{each['summary']}}</td>
+        <td><a href="{{ "/Calendar?id=" ~ each['id'] }}">{{each['summary']}}</a></td>
         <td>{{each['id']}}</td>
       </tr>
       {% endfor %}
