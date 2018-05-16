@@ -40,7 +40,7 @@ config = {'webapp2_extras.sessions': {'secret_key': 'my-super-secret-key'}}
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         # Cargar template
-        template = JINJA_ENVIRONMENT.get_template("index.php")
+        template = JINJA_ENVIRONMENT.get_template("index.html")
 
         # Renderizar template
         self.response.out.write(template.render())
@@ -103,8 +103,7 @@ class CalendarList(BaseHandler):
         metodo = 'GET'
         uri = '/calendar/v3/users/me/calendarList'
         cabeceras = {'Host': servidor,
-                     'Authorization': 'Bearer ' + access_token
-                     }
+                     'Authorization': 'Bearer ' + access_token}
         http = httplib2.Http()
         respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
 
@@ -113,7 +112,7 @@ class CalendarList(BaseHandler):
         json_cuerpo = json.loads(cuerpo)
 
         # Cargar template
-        template = JINJA_ENVIRONMENT.get_template("calendar_list.php")
+        template = JINJA_ENVIRONMENT.get_template("calendar_list.html")
         data = json_cuerpo
         
         # Renderizar template
@@ -122,10 +121,23 @@ class CalendarList(BaseHandler):
 
 class Calendar(BaseHandler):
     def get(self):
-        id = self.request.get('id')
+        calendar_id = self.request.get('id')
+
+        access_token = self.session.get('access_token')
+        logging.debug(access_token)
+
+        servidor = 'www.googleapis.com'
+        metodo = 'GET'
+        uri = '/calendar/v3/calendars/' + calendar_id + '/events'
+        cabeceras = {'Host': servidor,
+                     'Authorization': 'Bearer ' + access_token}
+        http = httplib2.Http()
+        respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
+        json_cuerpo = json.loads(cuerpo)
+
         # Cargar template
-        template = JINJA_ENVIRONMENT.get_template("calendar.php")
-        data = {'id': id}
+        template = JINJA_ENVIRONMENT.get_template("calendar.html")
+        data = {'events': json_cuerpo}
 
         # Renderizar template
         self.response.out.write(template.render(data))
