@@ -125,8 +125,7 @@ class Calendar(BaseHandler):
         id = self.request.get('id')
         # Cargar template
         template = JINJA_ENVIRONMENT.get_template("calendar.php")
-        data = {'id': id,
-                'id2': 2}
+        data = {'id': id}
 
         # Renderizar template
         self.response.out.write(template.render(data))

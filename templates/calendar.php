@@ -8,7 +8,6 @@
   </div>
   <div class="calendar_events">
     Id del calendario: {{id}}
-    Id de prueba: {{id2}}
   </div>
 </body>
 </html>
