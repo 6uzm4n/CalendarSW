@@ -39,6 +39,7 @@ config = {'webapp2_extras.sessions': {'secret_key': 'my-super-secret-key'}}
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+        logging.warning("HOLA.")
         # Cargar template
         template = JINJA_ENVIRONMENT.get_template("index.html")
 
@@ -134,10 +135,28 @@ class Calendar(BaseHandler):
         http = httplib2.Http()
         respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
         json_cuerpo = json.loads(cuerpo)
+        items = json_cuerpo['items']
+
+        maps_api_key = 'AIzaSyCp4euew8vLAzkrFXt1UBBTTjMxxiGNCZI'
+
+        logging.warning("Peticion iniciada:")
+        for each in items:
+            if 'location' in each:
+                location = each['location']
+                location = urllib.quote(location.encode('utf8'))
+                servidor = 'maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=' + maps_api_key
+                http = httplib2.Http()
+                respuesta, cuerpo = http.request('https://' + servidor)
+                logging.warning(cuerpo)
+                json_cuerpo = json.loads(cuerpo)
+                each['coordinates'] = json_cuerpo['results'][0]['geometry']['location']
+                logging.warning(json.dumps(each))
+
+
 
         # Cargar template
         template = JINJA_ENVIRONMENT.get_template("calendar.html")
-        data = {'events': json_cuerpo}
+        data = {'events': items}
 
         # Renderizar template
         self.response.out.write(template.render(data))
