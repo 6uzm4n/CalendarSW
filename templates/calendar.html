@@ -3,30 +3,99 @@
 {% block content %}
 
 <h1>Eventos</h1>
+Haz click en el evento cuya ubicación quieras ver en el mapa.
+<table width=100% height=100%><tr>
+<td width=50%>
 <div id="calendar_events">
-    {% for each in events %}
-    {{each['id']}}&emsp;&emsp;{{each['summary']}}&emsp;&emsp;{{each['location']}}<br>
-    {% endfor %}
+    <table class="custom_table">
+        <th>Evento</th>
+        <th>Fecha</th>
+        <th>Ubicación</th>
+        {% for each in events %}
+        <tr class="clickable" onclick="{% if 'location' in each %}deleteMarkers(); addMarker('{{each['id']}}');{% endif %}">
+            <td>{% if 'summary' in each %}{{each['summary']}}{% else %}---{% endif %}</td>
+            <td>{% if 'start' in each %}{{each['start']['date']}}{% else %}---{% endif %}</td>
+            <td>{% if 'location' in each %}{{each['location']}}{% else %}---{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <table class="custom_table">
+        <tr class="clickable" onclick="addAllMarker()"><td colspan="3">Mostrar todos los eventos</td></tr>
+        <tr class="clickable" onclick="deleteMarkers()"><td colspan="3">Ocultar todos los eventos</td></tr>
+    </table>
 </div>
-<div style="height:100%; width:100%; position: absolute;">
+</td>
+<td width=50%>
     <div id="map" class="map"></div>
-</div>
+</td>
+</tr></table>
 {% endblock %}
 {% block my_javascript %}
 
 <script>
+    var myMap;
+    var myMarkers = []
+    var defaultLat = 40.5;
+    var defaultLang = -3.75;
+
     function initMap() {
-        var center = {lat: -25.363, lng: 131.044};
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 2,
+        var center = {lat: defaultLat, lng: defaultLang};
+        myMap = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
           center: center
         });
+
+    }
+
+    function addMarker(id) {
+        var myLat;
+        var myLng;
+        var mySummary;
         {% for each in events %}
-        {% if 'coordinates' in each %}
-            var marker = new google.maps.Marker({position: {lat: {{each['coordinates']['lat']}},lng: {{each['coordinates']['lng']}}}, map: map});
-        {% endif %}
+        myLat = {% if 'coordinates' in each %}{{each['coordinates']['lat']}}{% else %}null{% endif %};
+        myLng = {% if 'coordinates' in each %}{{each['coordinates']['lng']}}{% else %}null{% endif %};
+        mySummary = {% if 'coordinates' in each %}"{{each['summary']}}"{% else %}null{% endif %};
+        if ((id == "{{each['id']}}") && myLat != null && myLng != null){
+            var newMarker = new google.maps.Marker({position: {lat: myLat, lng: myLng}, map: myMap, title: mySummary});
+            myMarkers.push(newMarker);
+            myMap.setCenter(new google.maps.LatLng(myLat,myLng));
+            myMap.setZoom(8);
+        }
         {% endfor %}
     }
+
+    function addAllMarker() {
+        deleteMarkers();
+        var myLat;
+        var myLng;
+        var mySummary;
+        {% for each in events %}
+        myLat = {% if 'coordinates' in each %}{{each['coordinates']['lat']}}{% else %}null{% endif %};
+        myLng = {% if 'coordinates' in each %}{{each['coordinates']['lng']}}{% else %}null{% endif %};
+        mySummary = {% if 'coordinates' in each %}"{{each['summary']}}"{% else %}null{% endif %};
+        if (myLat != null && myLng != null){
+            var newMarker = new google.maps.Marker({position: {lat: myLat, lng: myLng}, map: myMap, title: mySummary});
+            myMarkers.push(newMarker);
+            myMap.setCenter(new google.maps.LatLng(defaultLat,defaultLang));
+            myMap.setZoom(5);
+        }
+        {% endfor %}
+    }
+
+    // Sets the map on all markers in the array.
+      function setMapOnAll(map) {
+        for (var i = 0; i < myMarkers.length; i++) {
+          myMarkers[i].setMap(map);
+        }
+      }
+
+      // Deletes all markers in the array by removing references to them.
+      function deleteMarkers() {
+        setMapOnAll(null);
+        myMarkers = [];
+      }
+
 </script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCp4euew8vLAzkrFXt1UBBTTjMxxiGNCZI&callback=initMap"></script>

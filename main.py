@@ -134,6 +134,7 @@ class Calendar(BaseHandler):
                      'Authorization': 'Bearer ' + access_token}
         http = httplib2.Http()
         respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
+        logging.error(cuerpo)
         json_cuerpo = json.loads(cuerpo)
         items = json_cuerpo['items']
 
@@ -147,9 +148,10 @@ class Calendar(BaseHandler):
                 servidor = 'maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=' + maps_api_key
                 http = httplib2.Http()
                 respuesta, cuerpo = http.request('https://' + servidor)
-                logging.warning(cuerpo)
+                logging.error(cuerpo)
                 json_cuerpo = json.loads(cuerpo)
-                each['coordinates'] = json_cuerpo['results'][0]['geometry']['location']
+                if json_cuerpo['results'] != []:
+                    each['coordinates'] = json_cuerpo['results'][0]['geometry']['location']
                 logging.warning(json.dumps(each))
 
 

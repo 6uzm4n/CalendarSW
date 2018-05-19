@@ -1,23 +1,10 @@
-.map {
+.clickable {
+    cursor: pointer;
+}
+
+#map {
     height: 700px;
-    width: 90%;
-}
-
-table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
     width: 100%;
-    background-color: grey;
-}
-
-td, th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-}
-
-tr:nth-child(even) {
-    background-color: #dddddd;
 }
 
 /* Navivation bar */
@@ -41,7 +28,32 @@ li a {
     text-decoration: none;
 }
 
-/* Change the link color to #111 (black) on hover */
 li a:hover {
     background-color: #111;
+}
+
+/*
+ * Table custom style.
+ */
+.custom_table {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.custom_table td, .custom_table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.custom_table tr:nth-child(even){background-color: #f2f2f2;}
+
+.custom_table tr:hover {background-color: #ddd;}
+
+.custom_table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
 }
