@@ -97,6 +97,9 @@ class OAuthHandler(BaseHandler):
 
 class CalendarList(BaseHandler):
     def get(self):
+        if self.session.get('access_token') is str(None):
+            self.redirect('/')
+
         access_token = self.session.get('access_token')
         logging.debug(access_token)
 
@@ -122,6 +125,9 @@ class CalendarList(BaseHandler):
 
 class Calendar(BaseHandler):
     def get(self):
+        if self.session.get('access_token') is None:
+            self.redirect('/')
+
         calendar_id = self.request.get('id')
 
         access_token = self.session.get('access_token')
