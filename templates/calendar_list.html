@@ -3,14 +3,15 @@
 {% block content %}
 
 <h1>Mis calendarios de Google son:</h1>
-<table class="custom_table">
+<table class="fancy_table">
     <tr>
     <th>Nombre</th>
     <th>ID</th>
     </tr>
     {% for each in items %}
     <tr>
-        <td><a href="{{ "/Calendar?id=" ~ each['id'] }}">{{each['summary']}}</a></td>
+        {% set url = '/Calendar?id=' + do_urlescape(each['id']) %}
+        <td><a href="{{url}}">{{each['summary']}}</a></td>
         <td>{{each['id']}}</td>
     </tr>
     {% endfor %}

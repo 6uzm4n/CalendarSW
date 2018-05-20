@@ -10,10 +10,18 @@ from webapp2_extras import sessions
 
 import httplib2
 
+
+def do_urlescape(value):
+    """Escape for use in URLs."""
+    return urllib.quote(value.encode('utf8'))
+
+
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
+
+JINJA_ENVIRONMENT.globals['do_urlescape'] = do_urlescape
 
 # Claves
 client_id = "364280739195-pg4r0km6r1guvuvp8d8ts7f0i2jnchoh.apps.googleusercontent.com"
@@ -39,7 +47,6 @@ config = {'webapp2_extras.sessions': {'secret_key': 'my-super-secret-key'}}
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        logging.warning("HOLA.")
         # Cargar template
         template = JINJA_ENVIRONMENT.get_template("index.html")
 
@@ -62,8 +69,6 @@ class LoginAndAuthorize(BaseHandler):
         params_coded = urllib.urlencode(params)
         uri = '/o/oauth2/v2/auth' + '?' + params_coded
         self.redirect('https://' + servidor + uri)
-
-        logging.debug(params)
 
 
 class OAuthHandler(BaseHandler):
@@ -90,15 +95,12 @@ class OAuthHandler(BaseHandler):
 
         access_token = json_cuerpo['access_token']
         self.session['access_token'] = access_token
-        logging.debug(access_token)
-
         self.redirect('/CalendarList')
 
 
 class CalendarList(BaseHandler):
     def get(self):
         access_token = self.session.get('access_token')
-        logging.debug(access_token)
 
         servidor = 'www.googleapis.com'
         metodo = 'GET'
@@ -108,8 +110,6 @@ class CalendarList(BaseHandler):
         http = httplib2.Http()
         respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
 
-        logging.debug(respuesta)
-        logging.debug(cuerpo)
         json_cuerpo = json.loads(cuerpo)
 
         # Cargar template
@@ -123,9 +123,9 @@ class CalendarList(BaseHandler):
 class Calendar(BaseHandler):
     def get(self):
         calendar_id = self.request.get('id')
+        logging.debug(calendar_id)
 
         access_token = self.session.get('access_token')
-        logging.debug(access_token)
 
         servidor = 'www.googleapis.com'
         metodo = 'GET'
@@ -133,14 +133,16 @@ class Calendar(BaseHandler):
         cabeceras = {'Host': servidor,
                      'Authorization': 'Bearer ' + access_token}
         http = httplib2.Http()
+        uri = urllib.quote(uri)
         respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
-        logging.error(cuerpo)
+        logging.debug('https://' + servidor + uri)
+        logging.debug(respuesta)
+        logging.debug(cuerpo)
         json_cuerpo = json.loads(cuerpo)
         items = json_cuerpo['items']
 
         maps_api_key = 'AIzaSyCp4euew8vLAzkrFXt1UBBTTjMxxiGNCZI'
 
-        logging.warning("Peticion iniciada:")
         for each in items:
             if 'location' in each:
                 location = each['location']
@@ -148,13 +150,9 @@ class Calendar(BaseHandler):
                 servidor = 'maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=' + maps_api_key
                 http = httplib2.Http()
                 respuesta, cuerpo = http.request('https://' + servidor)
-                logging.error(cuerpo)
                 json_cuerpo = json.loads(cuerpo)
                 if json_cuerpo['results'] != []:
                     each['coordinates'] = json_cuerpo['results'][0]['geometry']['location']
-                logging.warning(json.dumps(each))
-
-
 
         # Cargar template
         template = JINJA_ENVIRONMENT.get_template("calendar.html")
@@ -171,3 +169,5 @@ app = webapp2.WSGIApplication([
     ('/callback_uri', OAuthHandler),
     ('/CalendarList', CalendarList),
     ('/Calendar', Calendar)], config=config, debug=True)
+
+

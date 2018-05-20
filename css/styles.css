@@ -2,9 +2,34 @@
     cursor: pointer;
 }
 
-#map {
-    height: 700px;
+.map {
+    top: 0;
+    height: 90vh;
     width: 100%;
+}
+
+.scrollable_table thead{
+    display: block;
+}
+
+.scrollable_table tbody{
+    display: block;
+    overflow-y: scroll;
+    max-height: 70vh;
+}
+
+.scrollable_table tr, .scrollable_table td, .scrollable_table th {
+    display: flex;
+    width: 100%;
+}
+
+.buttons_table{
+    height: 10vh;
+}
+
+.map_column{
+    vertical-align: top;
+    position: fixed;
 }
 
 /* Navivation bar */
@@ -14,6 +39,9 @@ ul {
     padding: 0;
     overflow: hidden;
     background-color: #333;
+    position: fixed;
+    top: 0;
+    width: 100%;
 }
 
 li {
@@ -35,22 +63,22 @@ li a:hover {
 /*
  * Table custom style.
  */
-.custom_table {
+.fancy_table {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
 }
 
-.custom_table td, .custom_table th {
+.fancy_table td, .fancy_table th {
     border: 1px solid #ddd;
     padding: 8px;
 }
 
-.custom_table tr:nth-child(even){background-color: #f2f2f2;}
+.fancy_table tr:nth-child(even){background-color: #f2f2f2;}
 
-.custom_table tr:hover {background-color: #ddd;}
+.fancy_table tr:hover {background-color: #ddd;}
 
-.custom_table th {
+.fancy_table th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
