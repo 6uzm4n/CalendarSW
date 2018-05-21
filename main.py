@@ -61,15 +61,14 @@ class LoginAndAuthorize(BaseHandler):
         conn.connect()
         metodo = 'GET'
         params = {'client_id': client_id,
-                  'redirect_uri': redirect_uri,
-                  'response_type': 'code',
-                  'scope': 'https://www.googleapis.com/auth/calendar',
-                  'approval_prompt': 'auto',
-                  'access_type': 'offline'}
+                'redirect_uri': redirect_uri,
+                'response_type': 'code',
+                'scope': 'https://www.googleapis.com/auth/calendar',
+                'approval_prompt': 'auto',
+                'access_type': 'offline'}
         params_coded = urllib.urlencode(params)
         uri = '/o/oauth2/v2/auth' + '?' + params_coded
         self.redirect('https://' + servidor + uri)
-
 
 class OAuthHandler(BaseHandler):
     def get(self):
@@ -100,16 +99,14 @@ class OAuthHandler(BaseHandler):
 
 class CalendarList(BaseHandler):
     def get(self):
-        if self.session.get('access_token') is str(None):
-            self.redirect('/')
-
         access_token = self.session.get('access_token')
 
         servidor = 'www.googleapis.com'
         metodo = 'GET'
         uri = '/calendar/v3/users/me/calendarList'
         cabeceras = {'Host': servidor,
-                     'Authorization': 'Bearer ' + access_token}
+                    'Authorization': 'Bearer ' + access_token}
+
         http = httplib2.Http()
         respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
 
@@ -118,16 +115,13 @@ class CalendarList(BaseHandler):
         # Cargar template
         template = JINJA_ENVIRONMENT.get_template("calendar_list.html")
         data = json_cuerpo
-        
+
         # Renderizar template
         self.response.out.write(template.render(data))
 
 
 class Calendar(BaseHandler):
     def get(self):
-        if self.session.get('access_token') is None:
-            self.redirect('/')
-
         calendar_id = self.request.get('id')
         logging.debug(calendar_id)
 
@@ -137,7 +131,7 @@ class Calendar(BaseHandler):
         metodo = 'GET'
         uri = '/calendar/v3/calendars/' + calendar_id + '/events'
         cabeceras = {'Host': servidor,
-                     'Authorization': 'Bearer ' + access_token}
+                    'Authorization': 'Bearer ' + access_token}
         http = httplib2.Http()
         uri = urllib.quote(uri)
         respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
