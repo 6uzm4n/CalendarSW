@@ -61,15 +61,14 @@ class LoginAndAuthorize(BaseHandler):
         conn.connect()
         metodo = 'GET'
         params = {'client_id': client_id,
-                  'redirect_uri': redirect_uri,
-                  'response_type': 'code',
-                  'scope': 'https://www.googleapis.com/auth/calendar',
-                  'approval_prompt': 'auto',
-                  'access_type': 'offline'}
+                'redirect_uri': redirect_uri,
+                'response_type': 'code',
+                'scope': 'https://www.googleapis.com/auth/calendar',
+                'approval_prompt': 'auto',
+                'access_type': 'offline'}
         params_coded = urllib.urlencode(params)
         uri = '/o/oauth2/v2/auth' + '?' + params_coded
         self.redirect('https://' + servidor + uri)
-
 
 class OAuthHandler(BaseHandler):
     def get(self):
@@ -102,7 +101,6 @@ class CalendarList(BaseHandler):
     def get(self):
         if self.session.get('access_token') is not None:
             access_token = self.session.get('access_token')
-
             servidor = 'www.googleapis.com'
             metodo = 'GET'
             uri = '/calendar/v3/users/me/calendarList'
@@ -168,12 +166,9 @@ class Calendar(BaseHandler):
             self.redirect('/')
 
 
-
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/LoginAndAuthorize', LoginAndAuthorize),
     ('/callback_uri', OAuthHandler),
     ('/CalendarList', CalendarList),
     ('/Calendar', Calendar)], config=config, debug=True)
-
-
