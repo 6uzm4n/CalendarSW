@@ -20,7 +20,7 @@
                 {% for each in events %}
                 <tr class="clickable" onclick="{% if 'location' in each %}deleteMarkers(); addMarker('{{each['id']}}');{% endif %}">
                     <td>{% if 'summary' in each %}{{each['summary']}}{% else %}---{% endif %}</td>
-                    <td>{% if 'start' in each %}{{each['start']['date']}}{% else %}---{% endif %}</td>
+                    <td>{% if 'start' in each %} {{each['start']['date']}} {{each['start']['dateTime']}} {% else %}---{% endif %}</td>
                     <td>{% if 'location' in each %}{{each['location']}}{% else %}---{% endif %}</td>
                 </tr>
                 {% endfor %}

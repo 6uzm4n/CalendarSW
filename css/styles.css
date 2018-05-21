@@ -15,7 +15,7 @@
 .scrollable_table tbody{
     display: block;
     overflow-y: scroll;
-    max-height: 70vh;
+    max-height: 50vh;
 }
 
 .scrollable_table tr, .scrollable_table td, .scrollable_table th {
