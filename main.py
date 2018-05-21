@@ -99,68 +99,71 @@ class OAuthHandler(BaseHandler):
 
 class CalendarList(BaseHandler):
     def get(self):
-        access_token = self.session.get('access_token')
+        if self.session.get('access_token') is not None:
+            access_token = self.session.get('access_token')
+            servidor = 'www.googleapis.com'
+            metodo = 'GET'
+            uri = '/calendar/v3/users/me/calendarList'
+            cabeceras = {'Host': servidor,
+                         'Authorization': 'Bearer ' + access_token}
+            http = httplib2.Http()
+            respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
 
-        servidor = 'www.googleapis.com'
-        metodo = 'GET'
-        uri = '/calendar/v3/users/me/calendarList'
-        cabeceras = {'Host': servidor,
-                    'Authorization': 'Bearer ' + access_token}
+            json_cuerpo = json.loads(cuerpo)
 
-        http = httplib2.Http()
-        respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
+            # Cargar template
+            template = JINJA_ENVIRONMENT.get_template("calendar_list.html")
+            data = json_cuerpo
 
-        json_cuerpo = json.loads(cuerpo)
-
-        # Cargar template
-        template = JINJA_ENVIRONMENT.get_template("calendar_list.html")
-        data = json_cuerpo
-
-        # Renderizar template
-        self.response.out.write(template.render(data))
+            # Renderizar template
+            self.response.out.write(template.render(data))
+        else:
+            self.redirect('/')
 
 
 class Calendar(BaseHandler):
     def get(self):
-        calendar_id = self.request.get('id')
-        logging.debug(calendar_id)
+        if self.session.get('access_token') is not None:
+            calendar_id = self.request.get('id')
+            logging.debug(calendar_id)
 
-        access_token = self.session.get('access_token')
+            access_token = self.session.get('access_token')
 
-        servidor = 'www.googleapis.com'
-        metodo = 'GET'
-        uri = '/calendar/v3/calendars/' + calendar_id + '/events'
-        cabeceras = {'Host': servidor,
-                    'Authorization': 'Bearer ' + access_token}
-        http = httplib2.Http()
-        uri = urllib.quote(uri)
-        respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
-        logging.debug('https://' + servidor + uri)
-        logging.debug(respuesta)
-        logging.debug(cuerpo)
-        json_cuerpo = json.loads(cuerpo)
-        items = json_cuerpo['items']
+            servidor = 'www.googleapis.com'
+            metodo = 'GET'
+            uri = '/calendar/v3/calendars/' + calendar_id + '/events'
+            cabeceras = {'Host': servidor,
+                         'Authorization': 'Bearer ' + access_token}
+            http = httplib2.Http()
+            uri = urllib.quote(uri)
+            respuesta, cuerpo = http.request('https://' + servidor + uri, method=metodo, headers=cabeceras)
+            logging.debug('https://' + servidor + uri)
+            logging.debug(respuesta)
+            logging.debug(cuerpo)
+            json_cuerpo = json.loads(cuerpo)
+            items = json_cuerpo['items']
 
-        maps_api_key = 'AIzaSyCp4euew8vLAzkrFXt1UBBTTjMxxiGNCZI'
+            maps_api_key = 'AIzaSyCp4euew8vLAzkrFXt1UBBTTjMxxiGNCZI'
 
-        for each in items:
-            if 'location' in each:
-                location = each['location']
-                location = urllib.quote(location.encode('utf8'))
-                servidor = 'maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=' + maps_api_key
-                http = httplib2.Http()
-                respuesta, cuerpo = http.request('https://' + servidor)
-                json_cuerpo = json.loads(cuerpo)
-                if json_cuerpo['results'] != []:
-                    each['coordinates'] = json_cuerpo['results'][0]['geometry']['location']
+            for each in items:
+                if 'location' in each:
+                    location = each['location']
+                    location = urllib.quote(location.encode('utf8'))
+                    servidor = 'maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=' + maps_api_key
+                    http = httplib2.Http()
+                    respuesta, cuerpo = http.request('https://' + servidor)
+                    json_cuerpo = json.loads(cuerpo)
+                    if json_cuerpo['results'] != []:
+                        each['coordinates'] = json_cuerpo['results'][0]['geometry']['location']
 
-        # Cargar template
-        template = JINJA_ENVIRONMENT.get_template("calendar.html")
-        data = {'events': items}
+            # Cargar template
+            template = JINJA_ENVIRONMENT.get_template("calendar.html")
+            data = {'events': items}
 
-        # Renderizar template
-        self.response.out.write(template.render(data))
-
+            # Renderizar template
+            self.response.out.write(template.render(data))
+        else:
+            self.redirect('/')
 
 
 app = webapp2.WSGIApplication([
@@ -169,5 +172,3 @@ app = webapp2.WSGIApplication([
     ('/callback_uri', OAuthHandler),
     ('/CalendarList', CalendarList),
     ('/Calendar', Calendar)], config=config, debug=True)
-
-
