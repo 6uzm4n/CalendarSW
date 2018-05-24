@@ -1,3 +1,41 @@
+/*
+ * Navivation bar
+ */
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #6666cc;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    -moz-transition: all 0.3s ease-in-out; /* Firefox */
+    -webkit-transition: all 0.3s ease-in-out; /*safari and chrome */
+}
+
+li a:hover {
+    background-color: #4444aa;
+    -moz-transition: all 0.3s ease-in-out; /* Firefox */
+    -webkit-transition: all 0.3s ease-in-out; /*safari and chrome */
+}
+
+/*
+ * Scrollable and clickable list Style
+ */
 .clickable {
     cursor: pointer;
 }
@@ -32,34 +70,6 @@
     position: fixed;
 }
 
-/* Navivation bar */
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-    position: fixed;
-    top: 0;
-    width: 100%;
-}
-
-li {
-    float: left;
-}
-
-li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-li a:hover {
-    background-color: #111;
-}
-
 /*
  * Table custom style.
  */
@@ -74,14 +84,23 @@ li a:hover {
     padding: 8px;
 }
 
+.fancy_table tr {
+    -moz-transition: all 0.3s ease-in-out; /* Firefox */
+    -webkit-transition: all 0.3s ease-in-out; /*safari and chrome */
+}
+
 .fancy_table tr:nth-child(even){background-color: #f2f2f2;}
 
-.fancy_table tr:hover {background-color: #ddd;}
+.fancy_table tr:hover {
+    background-color: #ddd;
+    -moz-transition: all 0.3s ease-in-out; /* Firefox */
+    -webkit-transition: all 0.3s ease-in-out; /*safari and chrome */
+}
 
 .fancy_table th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
-    background-color: #4CAF50;
+    background-color: #6666cc;
     color: white;
 }
